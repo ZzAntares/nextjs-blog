@@ -1,13 +1,18 @@
+import { GetStaticProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import Layout, { siteTitle } from '../components/layout'
-import Date from '../components/date'
+import Layout, { siteTitle } from '../components/Layout'
+import Date from '../components/Date'
 import utilStyles from '../styles/utils.module.css'
-import { getSortedPostsData } from '../lib/posts'
+import { getSortedPostsData, PostData } from '../lib/posts'
+
+type Props = {
+  posts: PostData[]
+}
 
 // The component now receives props object set by 'getStaticProps' defined below
-export default function Home({ allPostsData }) {
+export default function Home({ posts }: Props) {
   return (
     <Layout home>
       <Head>
@@ -26,7 +31,7 @@ export default function Home({ allPostsData }) {
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>Blog</h2>
         <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, date, title }) => (
+          {posts.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
               <Link href={`/posts/${id}`}>
                 <a>{title}</a>
@@ -44,13 +49,13 @@ export default function Home({ allPostsData }) {
 }
 
 // Use 'getServerSideProps' to run at request time instead which receives a 'context' containing request data
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async () => {
   // This function runs at build time
-  const allPostsData = getSortedPostsData()
+  const posts: PostData[] = getSortedPostsData()
 
   return {
     props: {
-      allPostsData,
+      posts,
     },
   }
 }
